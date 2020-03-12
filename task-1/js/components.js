@@ -1,13 +1,24 @@
+Vue.component("country-search", {
+  template:
+    '<input type="text" v-model="countryName" v-on:change="sendData"  placeholder="Search country ..."/>',
+  data() {
+    return {
+      countryName: ""
+    };
+  },
+  methods: {
+    sendData() {
+      this.$root.$emit("Country Entered", this.countryName);
+    }
+  }
+});
+
 Vue.component("countries", {
   template: `
   <div>
-  <div class="addCountrySection">
-  <input type="text" name="addCountryName" v-model="addCountryName" placeholder="country Name"/>
-  <input type="text" name="addCountryImage" v-model="addCountryImage" placeholder="country Image"/>
-  <button class="addCountryBtn" v-on:click="addElement">Add</button>
-  </div>
+
   <br>
-  <input type="text" v-model="countryName"  placeholder="Search country ..."/>
+
    <country v-for="country in filteredList" :key="country.id">
         <img :src="country.img" />
         <p v-bind:id="country.id">{{country.title}}</p>
@@ -33,34 +44,10 @@ Vue.component("countries", {
       ]
     };
   },
-  methods: {
-    addElement: function() {
-      var status = this.validateCountry(
-        this.addCountryName,
-        this.addCountryImage
-      );
-      if (status) {
-        this.countries.push({title: this.addCountryName, img: this.addCountryImage});
-        this.addCountryName = "";
-        this.addCountryImage = "";
-      }
-    },
-    validateCountry: function(countryName, countryImage) {
-      var status = true;
-      if (!countryName && !countryImage) {
-        alert("Please provide country name and image");
-        status = false;
-      } else if (
-        (!countryName && countryImage) ||
-        (countryName && !countryImage)
-      ) {
-        alert("Please provide the missing country name or the image");
-        status = false;
-      } else {
-        status = true;
-      }
-      return status;
-    }
+  mounted() {
+    this.$root.$on("Country Entered", countryName => {
+      this.countryName = countryName;
+    });
   },
   computed: {
     filteredList() {
